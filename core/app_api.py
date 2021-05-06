@@ -1,4 +1,20 @@
+from flask import request
+from telebot import types
+
 from app import app
+from core.bot_api import bot
+from database.models import TgUser
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    TgUser.query.get(1)
+    print('helloworld')
+    return app.response_class(
+        response='OK',
+        status=200,
+        mimetype='core/json'
+    )
 
 
 @app.route('/<token>', methods=['POST'])

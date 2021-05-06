@@ -1,11 +1,8 @@
-import time
-
 from telebot import types, TeleBot
 
-API_TOKEN = ''
-
-WEBHOOK_URL_BASE = "https://9b7f536ebbf9.ngrok.io"
-WEBHOOK_URL_PATH = "/%s" % API_TOKEN
+from config import API_TOKEN
+from database import db_app
+from database.models import TgUser
 
 bot = TeleBot(API_TOKEN)
 
@@ -38,8 +35,8 @@ def enable_subscribe(message):
         bot.send_message(message.chat.id, "Ви вже підписані на розсилку")
         return
     user = TgUser(chat_id=message.chat.id)
-    db.session.add(user)
-    db.session.commit()
+    db_app.session.add(user)
+    db_app.session.commit()
     bot.send_message(message.chat.id, "Тепер ви будете отримувати розсилку щодо аварійних відключень")
 
 
@@ -49,9 +46,8 @@ def disable_subscribe(message):
         bot.send_message(message.chat.id, "Ви ще не підписались")
         return
     TgUser.query.filter(TgUser.chat_id == message.chat.id).delete()
-    db.session.commit()
+    db_app.session.commit()
     bot.send_message(message.chat.id, "Ви відписались від розсилки")
-
 
 #
 #
@@ -82,9 +78,3 @@ def disable_subscribe(message):
 #         mimetype='core/json'
 #     )
 #
-bot.remove_webhook()
-
-time.sleep(0.1)
-
-# Set webhook
-bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)
